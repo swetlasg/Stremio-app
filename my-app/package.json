@@ -5,7 +5,10 @@
   "dependencies": {
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
-    "react-scripts": "1.1.4"
+    "react-scripts": "1.1.4",
+    "stremio-addon-client": "^1.5.2",
+    "stremio-aggregators": "^1.4.1",
+    "stremio-official-addons": "^1.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
