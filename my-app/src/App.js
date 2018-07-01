@@ -4,25 +4,14 @@ import officialAddons from 'stremio-official-addons';
 import aggregators from 'stremio-aggregators';
 import ItemRow from './components/ItemRow/ItemRow';
 
-// function FavoriteItem(props) {
-//   function pressFavorite() {
-//     props.toggleFavorite(props.name);
-//   }
-
-//   return ( 
-//     <div>
-//       <p>{props.name} <button onClick={pressFavorite}>V</button></p>
-//     </div>
-//   )
-// }  
 
 export class StremioApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: []
+      items: [],
+      favorites: localStorage.getItem('favoriteMovies') ? JSON.parse(localStorage.getItem('favoriteMovies')) : []
     }
-    //this.toggleFavorite = this.toggleFavorite.bind(this);
   }
 
   componentDidMount() {
@@ -37,12 +26,10 @@ export class StremioApp extends React.Component {
         if (result.response && result.response.metas) {
           const newItem = {
             title: result.type,
-            movies: result.response.metas,
-            isFavourite: false
+            movies: result.response.metas
           }
-          
           const newItems = [...self.state.items, newItem];
-          self.setState({items: newItems});
+          self.setState({ items: newItems });
         }
       });
     });
@@ -50,29 +37,35 @@ export class StremioApp extends React.Component {
 
   }
 
-  /*toggleFavorite(item) {
-    let newItems = [ ...this.state.items ];
-    let itemID = newItems.indexOf(item);
-    itemID.isFavorite = true;
-    this.setState({ items: newItems });
-  }*/
+  makeFavorite = (movieId) => {
+    //console.log(movieId);
+    
+    /*saving in localStorage*/
+    var favorites = localStorage.getItem('favoriteMovies');
+    if (!favorites) {
+      localStorage.setItem('favoriteMovies', "[]");
+      favorites = [];
+    }else {
+      favorites = JSON.parse(favorites);
+    }
 
-  makeFavorite = (index,movieId) => {
-    console.log(index);
-    console.log(movieId);
-    //let newMovies = [...this.state.items];
-
+    if (favorites.indexOf(movieId) != -1) {
+      var favIndex = favorites.indexOf(movieId);
+      favorites.splice(favIndex, 1);
+    } else {
+      favorites.push(movieId);
+      var items = [...this.state.items];
+    }
+    localStorage.setItem('favoriteMovies', JSON.stringify(favorites));
+    this.setState({favorites: favorites});
   }
 
   render() {
-    //var newList = this.state.items.map((item) => {return <FavoriteItem name={item} toggleFavorite={this.toggleFavorite}/> })
-    //var newList = this.state.items;
-    //console.log(newList);
     return (
       <div className='container'>
-        {this.state.items.map((item,index) =>
-         <ItemRow key={item.title + Math.random()} item={item} onFavoriteClicked={(movieId) => this.makeFavorite(index, movieId)} 
-         />)}
+        {this.state.items.map((item, index) =>
+          <ItemRow key={item.title + Math.random()} item={item} onFavoriteClicked={(movieId) => this.makeFavorite(movieId)} favorites={this.state.favorites}
+          />)}
       </div>
     )
   }
